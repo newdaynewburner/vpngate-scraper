@@ -15,11 +15,12 @@ import requests
 debug = False
 outdir = "~/Downloads/vpngate_scraper/"
 
-def parse_row_data(row):
+def parse_row_data(outdir, row):
 	""" Determine if the server detailed in this row is worthwhile, and
 	if so, extract and save relevant details
 	
 	Arguments:
+		outdir - dirpath - Location to write server configs to
 		row - dict - VPN server data
 		
 	Returns:
@@ -27,7 +28,7 @@ def parse_row_data(row):
 	"""
 	
 	row_data = (hostname, ip, score, ping, speed, country_long, country_short, num_vpn_sessions, uptime, total_users, total_traffic, log_type, operator, message, openvpn_config_data_base64) = row.split(",")
-	ovpn_file = "{0}-{1}.ovpn".format(row_data[5], row_data[1])
+	ovpn_file = os.path.join(outdir, "{0}-{1}.ovpn".format(row_data[5], row_data[1]))
 	with open(ovpn_file, "w") as f:
 		f.write(base64.b64decode(row_data[14]).decode("utf-8"))
 		
@@ -63,6 +64,6 @@ if __name__ == "__main__":
 			if c < 3 or c == last:
 				continue
 				
-			parse_row_data(row)
+			parse_row_data(outdir, row)
 			
 	exit(0)
